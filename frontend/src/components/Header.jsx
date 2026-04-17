@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Activity, Github, Zap, LogOut, UserCircle2 } from 'lucide-react';
+import { Activity, Github, Zap } from 'lucide-react';
 
 const PROVIDER_LABELS = {
   groq: 'Groq',
@@ -31,38 +31,7 @@ function ProviderChip() {
   );
 }
 
-function UserPill({ currentUser, authState, onLogout }) {
-  if (!currentUser) return null;
-  const isGuest = authState === 'guest';
-  const label = isGuest ? 'Guest' : (currentUser.email || 'Account');
-  const initials = isGuest
-    ? 'G'
-    : (currentUser.email ? currentUser.email[0].toUpperCase() : 'A');
-
-  return (
-    <div className="hidden sm:flex items-center gap-2 pl-2 pr-1 py-1 rounded-full border border-slate/40 bg-graphite/50">
-      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold ${
-        isGuest
-          ? 'bg-slate/40 text-mist'
-          : 'bg-blue-500/20 text-blue-200'
-      }`}>
-        {initials}
-      </div>
-      <span className="text-[11px] text-mist max-w-[140px] truncate" title={label}>
-        {label}
-      </span>
-      <button
-        onClick={onLogout}
-        title={isGuest ? 'Exit guest session' : 'Sign out'}
-        className="p-1 rounded-full hover:bg-slate/40 text-mist hover:text-cloud transition-colors"
-      >
-        <LogOut className="w-3.5 h-3.5" />
-      </button>
-    </div>
-  );
-}
-
-export default function Header({ onHistoryClick, onNewChatClick, currentUser, authState, onLogout }) {
+export default function Header({ onHistoryClick, onNewChatClick }) {
   return (
     <header className="border-b border-slate/30 bg-carbon/80 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -112,10 +81,7 @@ export default function Header({ onHistoryClick, onNewChatClick, currentUser, au
           >
             New Analysis
           </button>
-
-          {/* User pill — shows email or "Guest", with logout button */}
-          <UserPill currentUser={currentUser} authState={authState} onLogout={onLogout} />
-
+          
           {/* SDG badge */}
           <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/30">
             <span className="text-xs text-violet-400">SDG 9</span>

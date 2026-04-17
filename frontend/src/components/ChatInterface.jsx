@@ -9,7 +9,7 @@ import RiskBrief from './RiskBrief';
 import SupplyChainGraph from './SupplyChainGraph';
 import ScenarioSimulator from './ScenarioSimulator';
 import { getPersonas, updateUserProfile } from '../utils/api';
-import { exportAnalysisAsMarkdown, exportAnalysisAsHTML, exportAnalysisAsPDF } from '../utils/exportReport';
+import { exportAnalysisAsMarkdown, exportAnalysisAsHTML } from '../utils/exportReport';
 
 const PERSONA_ICONS = {
   shirt: Shirt,
@@ -148,17 +148,11 @@ function SuggestionChips({ suggestions, onSelect, disabled }) {
 }
 
 function FollowUpContent({ data }) {
-  if (!data || !data.suggestions || !Array.isArray(data.suggestions)) return null;
+  if (!data || !data.suggestions) return null;
   
-  const validSuggestions = data.suggestions.filter(item => 
-    item && (item.category || (item.options && item.options.length > 0) || item.route || item.status || item.strategy)
-  );
-
-  if (validSuggestions.length === 0) return null;
-
   return (
     <div className="mt-3 space-y-2">
-      {validSuggestions.map((item, i) => (
+      {data.suggestions.map((item, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, x: -10 }}
@@ -173,8 +167,8 @@ function FollowUpContent({ data }) {
           )}
           {item.options && item.options.map((opt, j) => (
             <div key={j} className="flex justify-between text-xs py-1 border-b border-slate/20 last:border-0">
-              <span className="text-cloud">{opt.country || opt.company || "Option"}: {opt.companies || ""}</span>
-              <span className="text-mist">{opt.lead_time || opt.transit_time || ""}</span>
+              <span className="text-cloud">{opt.country}: {opt.companies}</span>
+              <span className="text-mist">{opt.lead_time}</span>
             </div>
           ))}
           {item.route && (
@@ -260,28 +254,13 @@ function AnalysisWorkspace({ analysis, sessionId }) {
                 (typeof window !== 'undefined' &&
                   localStorage.getItem('supplychainiq_company_name')) ||
                 'SupplyChainIQ';
-              exportAnalysisAsPDF(analysis, { companyName });
-            }}
-            title="Open print dialog — pick 'Save as PDF' to download a board-ready report"
-            className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-mist hover:text-cloud hover:bg-graphite/60 transition-colors"
-          >
-            <Download className="h-3 w-3" />
-            PDF
-          </button>
-          <div className="w-px self-stretch bg-slate/40" />
-          <button
-            type="button"
-            onClick={() => {
-              const companyName =
-                (typeof window !== 'undefined' &&
-                  localStorage.getItem('supplychainiq_company_name')) ||
-                'SupplyChainIQ';
               exportAnalysisAsHTML(analysis, { companyName });
             }}
             title="Download as standalone HTML report (opens in any browser)"
-            className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-mist hover:text-cloud hover:bg-graphite/60 transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider text-mist hover:text-cloud hover:bg-graphite/60 transition-colors"
           >
-            HTML
+            <Download className="h-3 w-3" />
+            Export HTML
           </button>
           <div className="w-px self-stretch bg-slate/40" />
           <button

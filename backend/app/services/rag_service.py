@@ -3,7 +3,6 @@ RAG Service for SupplyChainIQ
 Handles context retrieval from mock vector database
 """
 
-import asyncio
 from typing import List, Dict, Any, Optional
 from ..data.mock_risk_data import (
     search_risks,
@@ -28,202 +27,64 @@ class RAGService:
         Extract key entities from supply chain description
         In production, this would use NER or Claude for extraction
         """
-        import re
         description_lower = supply_chain_description.lower()
-
-        # Region detection. The gazetteer is a (keyword -> canonical region)
-        # map. Matching is word-boundary regex to avoid false hits like
-        # "us" inside "usability" or "delhi" inside "newdelhi-something".
-        # Multi-word keys are matched as phrase substrings (regex would
-        # over-anchor on whitespace), but only after the single-word
-        # word-boundary pass to keep precision high.
+        
+        # Region detection
         regions = []
         region_keywords = {
-            # ---------- Asia ----------
             "taiwan": "Taiwan",
             "china": "China",
             "vietnam": "Vietnam",
-            "hanoi": "Vietnam",
-            "ho chi minh": "Vietnam",
-            "saigon": "Vietnam",
             "singapore": "Singapore",
             "malaysia": "Malaysia",
-            "kuala lumpur": "Malaysia",
-            "penang": "Malaysia",
             "thailand": "Thailand",
-            "bangkok": "Thailand",
             "india": "India",
             "bangladesh": "Bangladesh",
-            "dhaka": "Bangladesh",
-            "chittagong": "Bangladesh",
             "indonesia": "Indonesia",
-            "jakarta": "Indonesia",
             "japan": "Japan",
-            "tokyo": "Japan",
-            "yokohama": "Japan",
             "korea": "South Korea",
-            "south korea": "South Korea",
-            "seoul": "South Korea",
-            "busan": "South Korea",
-            "philippines": "Philippines",
-            "manila": "Philippines",
-            "cambodia": "Cambodia",
-            "myanmar": "Myanmar",
-            "pakistan": "Pakistan",
-            "karachi": "Pakistan",
-            "sri lanka": "Sri Lanka",
-            "colombo": "Sri Lanka",
-            # ---------- Americas ----------
             "us": "United States",
             "usa": "United States",
             "united states": "United States",
             "america": "United States",
-            "american": "United States",
-            "california": "United States",
-            "texas": "United States",
-            "los angeles": "United States",
-            "long beach": "United States",
-            "new york": "United States",
-            "mexico": "Mexico",
-            "monterrey": "Mexico",
-            "tijuana": "Mexico",
-            "brazil": "Brazil",
-            "sao paulo": "Brazil",
-            "santos": "Brazil",
-            "argentina": "Argentina",
-            "chile": "Chile",
-            "canada": "Canada",
-            # ---------- Europe ----------
             "europe": "Europe",
-            "european": "Europe",
-            "eu": "Europe",
             "germany": "Germany",
-            "german": "Germany",
-            "berlin": "Germany",
-            "hamburg": "Germany",
-            "munich": "Germany",
-            "frankfurt": "Germany",
-            "uk": "United Kingdom",
-            "britain": "United Kingdom",
-            "british": "United Kingdom",
-            "london": "United Kingdom",
-            "england": "United Kingdom",
-            "france": "France",
-            "french": "France",
-            "paris": "France",
-            "marseille": "France",
-            "italy": "Italy",
-            "italian": "Italy",
-            "spain": "Spain",
-            "netherlands": "Netherlands",
-            "dutch": "Netherlands",
-            "rotterdam": "Rotterdam",
-            "antwerp": "Antwerp",
-            "belgium": "Belgium",
-            "poland": "Poland",
-            "russia": "Russia-Ukraine",
-            "russian": "Russia-Ukraine",
-            "ukraine": "Russia-Ukraine",
-            # ---------- Middle East / Africa ----------
-            "uae": "UAE",
-            "dubai": "UAE",
-            "saudi": "Saudi Arabia",
-            "egypt": "Egypt",
-            "south africa": "South Africa",
-            "nigeria": "Nigeria",
-            "ethiopia": "Ethiopia",
-            "kenya": "Kenya",
-            "morocco": "Morocco",
-            "turkey": "Turkey",
-            "istanbul": "Turkey",
-            # ---------- Maritime chokepoints / waterways ----------
+            "mexico": "Mexico",
+            "brazil": "Brazil",
             "red sea": "Red Sea",
             "suez": "Suez Canal",
-            "suez canal": "Suez Canal",
             "panama": "Panama Canal",
-            "panama canal": "Panama Canal",
-            "south china sea": "South China Sea",
-            "strait of hormuz": "Strait of Hormuz",
-            "hormuz": "Strait of Hormuz",
-            "strait of malacca": "Strait of Malacca",
-            "malacca": "Strait of Malacca",
-            "rhine": "Rhine River",
-            "rhine river": "Rhine River",
-            "danube": "Danube River",
-            "mississippi": "Mississippi River",
-            # ---------- Indian states / cities (also imply India) ----------
+            # Indian states / cities — these all imply India for the
+            # focus_country auto-inference, and are also tagged as their
+            # own regions so intra-country reranking can match them.
             "tamil nadu": "India",
             "chennai": "India",
-            "madras": "India",
             "maharashtra": "India",
             "mumbai": "India",
-            "bombay": "India",
             "pune": "India",
-            "nagpur": "India",
             "delhi": "India",
             "ncr": "India",
-            "noida": "India",
-            "gurgaon": "India",
-            "gurugram": "India",
             "bangalore": "India",
             "bengaluru": "India",
             "karnataka": "India",
-            "mysore": "India",
             "gujarat": "India",
             "ahmedabad": "India",
-            "surat": "India",
-            "vadodara": "India",
             "mundra": "India",
-            "kandla": "India",
             "punjab": "India",
-            "amritsar": "India",
-            "ludhiana": "India",
             "haryana": "India",
             "uttarakhand": "India",
             "dehradun": "India",
-            "haridwar": "India",
             "assam": "India",
             "guwahati": "India",
             "kerala": "India",
-            "kochi": "India",
-            "trivandrum": "India",
             "hyderabad": "India",
-            "telangana": "India",
-            "andhra": "India",
-            "vizag": "India",
-            "visakhapatnam": "India",
             "kolkata": "India",
-            "calcutta": "India",
-            "west bengal": "India",
-            "rajasthan": "India",
-            "jaipur": "India",
-            "uttar pradesh": "India",
-            "lucknow": "India",
-            "kanpur": "India",
-            "bhopal": "India",
-            "indore": "India",
-            "madhya pradesh": "India",
-            "odisha": "India",
-            "bhubaneswar": "India",
-            "goa": "India",
-            "jharkhand": "India",
-            "bihar": "India",
-            "patna": "India",
         }
-
-        # Two-pass match. Phrases (with spaces) first, then single tokens
-        # with word-boundary regex so "us" doesn't match "usability".
-        text = description_lower
+        
         for keyword, region in region_keywords.items():
-            if " " in keyword:
-                if keyword in text:
-                    if region not in regions:
-                        regions.append(region)
-            else:
-                # Word-boundary match for single tokens
-                if re.search(r"\b" + re.escape(keyword) + r"\b", text):
-                    if region not in regions:
-                        regions.append(region)
+            if keyword in description_lower:
+                if region not in regions:
+                    regions.append(region)
         
         # Industry detection
         industries = []
@@ -277,7 +138,6 @@ class RAGService:
         max_results: int = 8,
         intra_country_focus: bool = False,
         focus_country: Optional[str] = None,
-        use_live_feeds: bool = False,
     ) -> Dict[str, Any]:
         """
         Retrieve relevant risk context based on supply chain description.
@@ -286,11 +146,6 @@ class RAGService:
           - boost risks whose `country` or `region` matches focus_country
           - prefer logistics/road/rail risks
           - deprioritize cross-border maritime chokepoints
-
-        When use_live_feeds is True, the retriever also pulls fresh news
-        articles from GDELT for the detected regions and merges them
-        with the mock corpus before reranking. Falls back silently to
-        mock-only on any GDELT error.
         """
         # Extract entities
         entities = self.extract_entities(supply_chain_description)
@@ -309,30 +164,6 @@ class RAGService:
             categories=None
         )
 
-        # Optionally augment with live GDELT articles for the detected
-        # regions. Done here so the reranker can score live + mock
-        # uniformly. Synchronous call into an async service via
-        # asyncio.run is fine because retrieve_context is itself sync.
-        if use_live_feeds:
-            live_risks = self._fetch_live_feeds(entities.get("regions") or [], focus_country)
-            if live_risks:
-                # Live entries get a competitive starter score so they
-                # actually surface in the top-N. Region-matched live news
-                # outranks mock keyword hits because it's dated, sourced,
-                # and more recent — exactly what an SME owner cares about.
-                detected_lower = {r.lower() for r in (entities.get("regions") or [])}
-                seen_ids = {r.get("id") for r in risk_results}
-                for lr in live_risks:
-                    if lr.get("id") in seen_ids:
-                        continue
-                    # Region-matched live: 1.20 (above mock max of 1.00)
-                    # Unmatched live: 0.85 (below mock max, used as filler)
-                    if str(lr.get("region", "")).lower() in detected_lower:
-                        score = 1.20
-                    else:
-                        score = 0.85
-                    risk_results.append({**lr, "relevance_score": score})
-
         if intra_country_focus:
             # Safety net: even if the keyword search missed them, inject
             # every intra-country risk for the focus country so the
@@ -348,11 +179,6 @@ class RAGService:
                         risk_results.append({**r, "relevance_score": 0.5})
 
             risk_results = self._apply_local_focus(risk_results, focus_country)
-        else:
-            # Re-sort the merged list (mock + live) by relevance before
-            # truncating. Without this, GDELT items appended after the
-            # already-sorted mock list would always get cut by [:N].
-            risk_results.sort(key=lambda r: r.get("relevance_score", 0), reverse=True)
 
         risk_results = risk_results[:max_results]
 
@@ -401,60 +227,6 @@ class RAGService:
         "red sea", "suez canal", "panama canal",
         "south china sea", "strait of hormuz", "strait of malacca",
     }
-
-    def _fetch_live_feeds(
-        self,
-        regions: List[str],
-        focus_country: Optional[str] = None,
-    ) -> List[Dict[str, Any]]:
-        """
-        Pull live news articles from GDELT for the detected regions.
-        Returns risk-shaped dicts. Returns [] silently on any error so
-        retrieval always degrades gracefully to mock-only.
-
-        Bridges sync->async because retrieve_context is itself sync.
-        Uses asyncio.run when no loop is present, or schedules on the
-        current loop when called from inside async code.
-        """
-        try:
-            from .gdelt_service import gdelt_service
-        except Exception:
-            return []
-
-        # Build the region list. Include focus_country if it's not
-        # already in the detected regions (the local-focus auto-infer path).
-        query_regions = list(regions or [])
-        if focus_country and focus_country not in query_regions:
-            query_regions.insert(0, focus_country)
-        if not query_regions:
-            return []
-
-        try:
-            # Try the simple path first — this works when retrieve_context
-            # is called from sync code (like the eval harness or tests).
-            return asyncio.run(gdelt_service.fetch_for_regions(query_regions))
-        except RuntimeError:
-            # We're inside an existing event loop (FastAPI request).
-            # Run the coroutine in a fresh loop on a worker thread so
-            # we don't block or conflict with the parent loop.
-            import concurrent.futures
-
-            def _runner():
-                loop = asyncio.new_event_loop()
-                try:
-                    return loop.run_until_complete(
-                        gdelt_service.fetch_for_regions(query_regions)
-                    )
-                finally:
-                    loop.close()
-
-            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
-                try:
-                    return ex.submit(_runner).result(timeout=10.0)
-                except Exception:
-                    return []
-        except Exception:
-            return []
 
     def _apply_local_focus(
         self,
@@ -535,17 +307,13 @@ class RAGService:
         
         # Risk alerts
         for risk in context.get("risks", []):
-            is_live = risk.get("source") == "gdelt"
-            live_tag = " 🔴 LIVE" if is_live else ""
-            lines.append(f"**[{risk['risk_level'].upper()}]{live_tag} {risk['title']}** (Region: {risk['region']})")
+            lines.append(f"**[{risk['risk_level'].upper()}] {risk['title']}** (Region: {risk['region']})")
             lines.append(f"- Category: {risk['category']}")
             lines.append(f"- Description: {risk['description']}")
             lines.append(f"- Affected Industries: {', '.join(risk['affected_industries'])}")
             lines.append(f"- Sources: {', '.join(risk['sources'])}")
             lines.append(f"- Confidence: {risk['confidence']}")
             lines.append(f"- Last Updated: {risk['last_updated']}")
-            if is_live and risk.get("url"):
-                lines.append(f"- Article URL: {risk['url']}")
             lines.append("")
         
         # Alternative suppliers

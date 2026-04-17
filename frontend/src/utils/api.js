@@ -5,127 +5,14 @@
 const API_BASE = '/api/v1';
 
 function getHeaders() {
-  const jwt = localStorage.getItem('supplychainiq_jwt');
   const userId = localStorage.getItem('supplychainiq_user_id') || 'guest';
   const preferred = localStorage.getItem('supplychainiq_preferred_provider') || '';
   const headers = {
     'Content-Type': 'application/json',
+    'X-User-ID': userId,
   };
-  // Prefer JWT auth when available; fall back to legacy guest header
-  // so the one-click demo path keeps working without registration.
-  if (jwt) {
-    headers['Authorization'] = `Bearer ${jwt}`;
-  } else {
-    headers['X-User-ID'] = userId;
-  }
   if (preferred) headers['X-Preferred-Provider'] = preferred;
   return headers;
-}
-
-/**
- * Register a new account. On success, stores the JWT + user info in
- * localStorage and returns the user object.
- */
-export async function register(email, password, companyName, companyType) {
-  const response = await fetch(`${API_BASE}/auth/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      email,
-      password,
-      company_name: companyName || null,
-      company_type: companyType || null,
-    }),
-  });
-  if (!response.ok) {
-    const detail = await response.json().catch(() => ({}));
-    throw new Error(detail.detail || 'Registration failed');
-  }
-  const data = await response.json();
-  _persistAuth(data);
-  return data;
-}
-
-/**
- * Login with email + password. On success, stores JWT and returns user info.
- */
-export async function login(email, password) {
-  const response = await fetch(`${API_BASE}/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!response.ok) {
-    const detail = await response.json().catch(() => ({}));
-    throw new Error(detail.detail || 'Login failed');
-  }
-  const data = await response.json();
-  _persistAuth(data);
-  return data;
-}
-
-/**
- * Validate the stored JWT against the backend. Returns the user object
- * on success, or null on any failure (no token, expired, invalid).
- * Used on app boot to decide whether to show the login screen.
- */
-export async function fetchCurrentUser() {
-  const jwt = localStorage.getItem('supplychainiq_jwt');
-  if (!jwt) return null;
-  try {
-    const response = await fetch(`${API_BASE}/auth/me`, {
-      headers: { 'Authorization': `Bearer ${jwt}` },
-    });
-    if (!response.ok) {
-      // Token rejected — clear it so the user gets a clean login screen
-      logout();
-      return null;
-    }
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Clear all auth state from localStorage.
- */
-export function logout() {
-  localStorage.removeItem('supplychainiq_jwt');
-  localStorage.removeItem('supplychainiq_user_id');
-  localStorage.removeItem('supplychainiq_email');
-  localStorage.removeItem('supplychainiq_company_name');
-  localStorage.removeItem('supplychainiq_company_type');
-}
-
-/**
- * Switch into one-click guest mode (no registration). Used by the
- * "Continue as guest" button on the login screen so judges can demo
- * without signing up.
- */
-export function continueAsGuest() {
-  logout();
-  const guestId = 'guest_' + Date.now();
-  localStorage.setItem('supplychainiq_user_id', guestId);
-}
-
-function _persistAuth(authResponse) {
-  if (!authResponse) return;
-  if (authResponse.access_token) {
-    localStorage.setItem('supplychainiq_jwt', authResponse.access_token);
-  }
-  if (authResponse.user_id) {
-    localStorage.setItem('supplychainiq_user_id', authResponse.user_id);
-  }
-  if (authResponse.email) {
-    localStorage.setItem('supplychainiq_email', authResponse.email);
-  }
-  if (authResponse.company_name) {
-    localStorage.setItem('supplychainiq_company_name', authResponse.company_name);
-  }
-  if (authResponse.company_type) {
-    localStorage.setItem('supplychainiq_company_type', authResponse.company_type);
-  }
 }
 
 /**
@@ -186,15 +73,9 @@ export async function uploadContextFile(file, sessionId = null) {
     formData.append('session_id', sessionId);
   }
 
-  const jwt = localStorage.getItem('supplychainiq_jwt');
   const userId = localStorage.getItem('supplychainiq_user_id') || 'guest';
   const preferred = localStorage.getItem('supplychainiq_preferred_provider') || '';
-  const headers = {};
-  if (jwt) {
-    headers['Authorization'] = `Bearer ${jwt}`;
-  } else {
-    headers['X-User-ID'] = userId;
-  }
+  const headers = { 'X-User-ID': userId };
   if (preferred) headers['X-Preferred-Provider'] = preferred;
 
   const response = await fetch(`${API_BASE}/analysis/upload-context`, {

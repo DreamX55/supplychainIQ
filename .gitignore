@@ -56,6 +56,3 @@ backend/data/*.sqlite
 backend/data/.vault_key
 data/*.db
 *.db
-
-# Visual Assets
-!docs/images/

@@ -2,19 +2,20 @@
 API Keys Router for SupplyChainIQ
 CRUD endpoints for managing per-user encrypted LLM API keys.
 
-User identity is resolved through the standard auth dependency, which
-accepts either a JWT in `Authorization: Bearer` or the legacy
-`X-User-ID` guest header.
+Uses X-User-ID header for user identification (Sub-Task 1.3 will add
+proper multi-user auth; for now this is the foundation).
 """
 
 from typing import List, Optional
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Header
 from pydantic import BaseModel, Field
 
 from ..services.key_vault import key_vault
-from ..dependencies import get_current_user_id
 
 router = APIRouter(prefix="/api/v1/keys", tags=["api-keys"])
+
+# Default user ID when no header is provided (single-user demo mode)
+DEFAULT_USER = "default"
 
 
 # ------------------------------------------------------------------
@@ -58,18 +59,29 @@ class DeleteResponse(BaseModel):
 
 
 # ------------------------------------------------------------------
+# Helper
+# ------------------------------------------------------------------
+
+def _get_user_id(x_user_id: Optional[str]) -> str:
+    """Extract user ID from header or use default."""
+    return x_user_id.strip() if x_user_id else DEFAULT_USER
+
+
+# ------------------------------------------------------------------
 # Endpoints
 # ------------------------------------------------------------------
 
 @router.post("/store", response_model=KeyInfoResponse)
 async def store_api_key(
     body: StoreKeyRequest,
-    user_id: str = Depends(get_current_user_id),
+    x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
     """
     Store an encrypted API key for an LLM provider.
     Overwrites any existing key for the same provider.
     """
+    user_id = _get_user_id(x_user_id)
+
     try:
         key_vault.store_key(user_id, body.provider, body.api_key)
     except ValueError as e:
@@ -84,12 +96,13 @@ async def store_api_key(
 
 @router.get("/list", response_model=KeyListResponse)
 async def list_keys(
-    user_id: str = Depends(get_current_user_id),
+    x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
     """
     List all providers that have stored keys for the current user.
     Also returns which providers are globally available (env vars).
     """
+    user_id = _get_user_id(x_user_id)
     providers = key_vault.list_providers(user_id)
 
     # Import here to avoid circular deps
@@ -106,12 +119,13 @@ async def list_keys(
 @router.get("/info/{provider}", response_model=KeyInfoResponse)
 async def get_key_info(
     provider: str,
-    user_id: str = Depends(get_current_user_id),
+    x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
     """
     Get metadata about a stored key (masked preview, timestamps).
     Never returns the full key.
     """
+    user_id = _get_user_id(x_user_id)
     info = key_vault.get_key_info(user_id, provider)
 
     if not info:
@@ -126,9 +140,10 @@ async def get_key_info(
 @router.delete("/delete/{provider}", response_model=DeleteResponse)
 async def delete_key(
     provider: str,
-    user_id: str = Depends(get_current_user_id),
+    x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
     """Delete a stored API key for a specific provider."""
+    user_id = _get_user_id(x_user_id)
     deleted = key_vault.delete_key(user_id, provider)
 
     if not deleted:
@@ -142,8 +157,9 @@ async def delete_key(
 
 @router.delete("/delete-all", response_model=DeleteResponse)
 async def delete_all_keys(
-    user_id: str = Depends(get_current_user_id),
+    x_user_id: Optional[str] = Header(None, alias="X-User-ID"),
 ):
     """Delete all stored API keys for the current user."""
+    user_id = _get_user_id(x_user_id)
     count = key_vault.delete_all_keys(user_id)
     return DeleteResponse(deleted=count > 0, count=count)

@@ -27,8 +27,6 @@ class UserDB(Base):
     __tablename__ = "users"
     
     user_id = Column(String, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True, nullable=True)
-    password_hash = Column(String, nullable=True)
     company_name = Column(String, nullable=True)
     company_type = Column(String, nullable=True)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
@@ -86,18 +84,3 @@ async def init_db():
     async with engine.begin() as conn:
         # Create all tables
         await conn.run_sync(Base.metadata.create_all)
-        # Lightweight migration: add `email` and `password_hash` columns to
-        # existing `users` tables created by older builds. SQLite is lax
-        # about schema changes so this is safe and idempotent.
-        from sqlalchemy import text
-        try:
-            existing_cols = await conn.execute(text("PRAGMA table_info(users)"))
-            cols = {row[1] for row in existing_cols.fetchall()}
-            if "email" not in cols:
-                await conn.execute(text("ALTER TABLE users ADD COLUMN email VARCHAR"))
-            if "password_hash" not in cols:
-                await conn.execute(text("ALTER TABLE users ADD COLUMN password_hash VARCHAR"))
-        except Exception:
-            # If the table doesn't exist yet (fresh DB) create_all already
-            # handled it — silently ignore.
-            pass

@@ -5,17 +5,11 @@ import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
 import SetupScreen from './components/SetupScreen';
 import HistoryScreen from './components/HistoryScreen';
-import LoginScreen from './components/LoginScreen';
 import { useAnalysis } from './hooks/useAnalysis';
-import { fetchCurrentUser, logout as apiLogout } from './utils/api';
 
 export default function App() {
-  // Auth state: 'checking' | 'authed' | 'guest' | 'unauthed'
-  const [authState, setAuthState] = useState('checking');
-  const [currentUser, setCurrentUser] = useState(null);
-
   const [currentScreen, setCurrentScreen] = useState('setup'); // setup, chat, history
-
+  
   const {
     loading: isLoading,
     error,
@@ -28,47 +22,13 @@ export default function App() {
     resetSession: reset,
   } = useAnalysis();
 
-  // On boot: validate any stored JWT against /auth/me. If valid -> authed.
-  // If no JWT but a guest user_id is set -> stay in guest mode (legacy path).
-  // Otherwise -> show login screen.
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const jwt = localStorage.getItem('supplychainiq_jwt');
-      if (jwt) {
-        const user = await fetchCurrentUser();
-        if (cancelled) return;
-        if (user) {
-          setCurrentUser(user);
-          setAuthState('authed');
-          return;
-        }
-      }
-      // No valid JWT — check if a guest session already exists
-      const guestId = localStorage.getItem('supplychainiq_user_id');
-      if (guestId && guestId.startsWith('guest')) {
-        setCurrentUser({ user_id: guestId, email: null });
-        setAuthState('guest');
-      } else {
-        setAuthState('unauthed');
-      }
-    })();
-    return () => { cancelled = true; };
+    // Basic setup check loop
+    const userId = localStorage.getItem('supplychainiq_user_id');
+    if (!userId) {
+      localStorage.setItem('supplychainiq_user_id', 'user_' + Date.now());
+    }
   }, []);
-
-  const handleAuthSuccess = useCallback((user) => {
-    setCurrentUser(user);
-    setAuthState(user?.email ? 'authed' : 'guest');
-    setCurrentScreen('setup');
-  }, []);
-
-  const handleLogout = useCallback(() => {
-    apiLogout();
-    setCurrentUser(null);
-    setAuthState('unauthed');
-    reset();
-    setCurrentScreen('setup');
-  }, [reset]);
 
   const handleSetupComplete = useCallback(() => {
     setCurrentScreen('chat');
@@ -87,30 +47,6 @@ export default function App() {
     }
   }, [analysis, messages, analyze, askFollowUp]);
 
-  // While we're checking auth, render a thin loading shell
-  if (authState === 'checking') {
-    return (
-      <div className="h-screen flex items-center justify-center bg-slate-950 text-slate-400 text-sm">
-        Loading workspace…
-      </div>
-    );
-  }
-
-  // Not signed in and no guest session — show login
-  if (authState === 'unauthed') {
-    return (
-      <div className="h-screen flex flex-col bg-slate-950 text-slate-200 overflow-auto">
-        <div className="fixed inset-0 pointer-events-none opacity-20">
-          <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-600 blur-[120px]" />
-          <div className="absolute top-[60%] -right-[10%] w-[50%] h-[50%] rounded-full bg-indigo-600 blur-[120px]" />
-        </div>
-        <div className="relative z-10 flex-1">
-          <LoginScreen onAuthSuccess={handleAuthSuccess} />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="h-screen flex flex-col bg-slate-950 text-slate-200 overflow-hidden">
       {/* Background glow effects */}
@@ -119,17 +55,14 @@ export default function App() {
         <div className="absolute top-[60%] -right-[10%] w-[50%] h-[50%] rounded-full bg-indigo-600 blur-[120px]" />
       </div>
 
-      <Header
+      <Header 
         onHistoryClick={() => setCurrentScreen('history')}
         onNewChatClick={() => {
           reset();
           setCurrentScreen('chat');
         }}
-        currentUser={currentUser}
-        authState={authState}
-        onLogout={handleLogout}
       />
-
+      
       <div className="flex-1 flex overflow-hidden relative z-10">
         {currentScreen !== 'setup' && (
           <Sidebar analysis={analysis} />
