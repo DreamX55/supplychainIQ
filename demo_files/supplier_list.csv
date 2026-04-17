@@ -1,0 +1,16 @@
+Supplier_ID,Supplier_Name,Country,Region,Component,Tier,Lead_Time_Days,Annual_Value_USD,Single_Source,Contract_Expiry,Certifications,Last_Audit_Score
+SUP-001,TSMC,Taiwan,Asia Pacific,Advanced Semiconductors (5nm),1,90,42000000,Yes,2025-12-31,ISO9001;IATF16949,87
+SUP-002,Samsung SDI,South Korea,Asia Pacific,Lithium-Ion Battery Cells,1,60,18500000,No,2026-06-30,ISO9001;UL,91
+SUP-003,Shenzhen Foxconn,China,Asia Pacific,PCB Assembly,2,45,9200000,No,2025-09-30,ISO9001,79
+SUP-004,Daikin Vietnam,Vietnam,Asia Pacific,Compressor Units,2,55,4100000,No,2026-03-31,ISO14001;ISO9001,85
+SUP-005,Infineon Germany,Germany,Europe,Power Management ICs,1,75,7800000,Yes,2026-12-31,ISO9001;AEC-Q100,93
+SUP-006,BASF SE,Germany,Europe,Specialty Chemicals (Electrolyte),2,30,2300000,No,2025-11-30,REACH;ISO14001,90
+SUP-007,Flex Ltd Ukraine,Ukraine,Eastern Europe,Wiring Harnesses,2,40,3600000,Yes,2025-08-31,IATF16949,72
+SUP-008,Hindustan Copper,India,South Asia,Copper Windings,3,25,1800000,No,2026-01-31,ISO9001,81
+SUP-009,Rio Tinto Australia,Australia,Oceania,Lithium Carbonate (Raw),3,50,6700000,No,2026-09-30,ISO14001,88
+SUP-010,Vale Brazil,Brazil,South America,Nickel Sulphate,3,65,5400000,No,2027-01-31,ISO14001,86
+SUP-011,STMicroelectronics Italy,Italy,Europe,Microcontrollers,1,80,3200000,No,2026-06-30,ISO9001;AEC-Q100,89
+SUP-012,Yokogawa Japan,Japan,Asia Pacific,Industrial Sensors,2,70,2100000,No,2025-12-31,ISO9001,92
+SUP-013,PT Freeport Indonesia,Indonesia,Asia Pacific,Copper Concentrate,3,55,4900000,No,2026-04-30,ISO14001,77
+SUP-014,Covestro Netherlands,Netherlands,Europe,Polycarbonate Resin,2,20,1400000,No,2025-10-31,REACH;ISO9001,84
+SUP-015,Albemarle Chile,Chile,South America,Lithium Hydroxide,3,70,8200000,No,2026-11-30,ISO14001,83
