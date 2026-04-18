@@ -1,0 +1,81 @@
+NEXACORE TECHNOLOGIES — SUPPLY CHAIN RISK BRIEFING
+Internal Document | Q2 2026 | Prepared by: Supply Chain Intelligence Team
+Classification: CONFIDENTIAL — For internal use and authorised demo only
+==========================================================================
+
+COMPANY OVERVIEW
+----------------
+NexaCore Technologies is a mid-size electronics manufacturer headquartered in Munich, Germany.
+We produce industrial IoT sensors and edge computing modules sold to automotive, healthcare,
+and smart infrastructure clients across Europe and North America.
+
+Annual Revenue: $340M
+Employees: 2,400
+Manufacturing Sites: Munich (Germany), Wroclaw (Poland)
+Primary Markets: Germany (35%), USA (28%), France (14%), UK (12%), Other (11%)
+
+
+CRITICAL DEPENDENCIES & KNOWN VULNERABILITIES
+----------------------------------------------
+
+1. SEMICONDUCTOR CONCENTRATION RISK — CRITICAL
+   Our primary source for advanced 5nm processing chips is TSMC in Taiwan (Supplier SUP-001).
+   TSMC accounts for 78% of our chip procurement. No qualified alternative source exists for
+   the 5nm node. A 3-month disruption to TSMC operations would halt our flagship product line
+   (NexaSense Pro) within 6 weeks due to our current safety stock levels.
+
+   Current safety stock: 6 weeks at current production rate.
+   Qualification lead time for alternative (Intel Fab Ireland): estimated 14-18 months.
+
+2. RED SEA SHIPPING DISRUPTION — HIGH (ONGOING)
+   All maritime shipments from Asia to our Munich and Wroclaw facilities travel via the
+   Suez Canal route. Since Q4 2024, Houthi attacks in the Red Sea have forced our carriers
+   to reroute via the Cape of Good Hope, adding 14-18 days to transit times and increasing
+   freight costs by approximately €1.2M per quarter vs. baseline.
+
+   Impact: Component inventory buffers strained. Production planning horizon extended from
+   6 weeks to 10 weeks. Air freight used for urgent semiconductor shipments (high cost).
+
+3. UKRAINE WIRING HARNESSES — HIGH
+   Supplier SUP-007 (Flex Ltd Ukraine) produces 100% of our proprietary wiring harnesses
+   used in the NexaCore Edge series. This is a single-source supplier with a factory in
+   Lviv, Western Ukraine. Contract expires August 2025. Last audit score: 72/100.
+
+   Continuity: Factory has not experienced direct disruption however insurance underwriters
+   have flagged the Romania relocation option as mandatory for contract renewal.
+   We have begun qualification of an alternative supplier in Bialystok, Poland (18 months
+   to qualify).
+
+4. LITHIUM SUPPLY CHAIN — MEDIUM
+   Battery cells sourced from Samsung SDI (South Korea). Raw lithium sourced from Albemarle
+   (Chile) and Rio Tinto (Australia). No single-source dependency at raw material level.
+   However, lithium hydroxide price volatility is significant (+40% YoY in 2025).
+
+5. CURRENCY & TARIFF RISK — MEDIUM
+   28% of our revenue comes from the US market, invoiced in USD. EUR/USD volatility has
+   compressed margins by approximately 2.1% in Q1 2026.
+   New US Section 301 tariff review scheduled for June 2026 may affect electronic components
+   imported from China (currently 15% tariff). We have begun dual-sourcing PCB assembly
+   to Vietnam (SUP-004) to reduce China exposure.
+
+
+RECENT INCIDENTS
+----------------
+- March 2026: TSMC fab in Hsinchu experienced a 2-day power outage. Impact to NexaCore:
+  delayed one production batch, approximately €800K revenue impact. Recovery complete.
+- February 2026: Brazilian port workers' strike (Santos) delayed nickel sulphate shipment
+  from Vale by 9 days. Safety stock absorbed the delay.
+- January 2026: Ukrainian supplier Flex Ltd flagged potential factory relocation by Q3 2026.
+  NexaCore procurement team engaged in emergency qualification of alternative.
+
+
+STRATEGIC PRIORITIES FOR Q2/Q3 2026
+--------------------------------------
+1. Reduce TSMC single-source dependency below 50% by end of 2027.
+2. Dual-source all Tier-1 suppliers for NexaSense Pro product line.
+3. Increase safety stock for critical semiconductors from 6 weeks to 12 weeks.
+4. Establish nearshore European suppliers for Tier-2 wiring and assembly components.
+5. Implement dynamic re-routing protocol for maritime shipments (trigger: >7 day delay).
+
+
+CONTACT: supply-chain-risk@nexacore.tech | +49 89 4521 3300

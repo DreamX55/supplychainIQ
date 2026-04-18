@@ -1,0 +1,13 @@
+Route_ID,Origin_Port,Destination_Port,Carrier,Transit_Days,Frequency_Per_Month,Current_Status,Delay_Days,Freight_Rate_USD_per_TEU,Last_Shipment,Next_Departure,Notes
+RT-001,Kaohsiung (Taiwan),Rotterdam (Netherlands),Maersk Line,28,8,DISRUPTED,12,4800,2026-04-01,2026-04-12,Rerouted via Cape of Good Hope due to Red Sea conflict. +14 days added.
+RT-002,Busan (South Korea),Rotterdam (Netherlands),HMM,30,6,DELAYED,5,4200,2026-04-03,2026-04-15,Minor delay at Suez Canal inspection zone.
+RT-003,Shanghai (China),Los Angeles (USA),COSCO,16,12,NORMAL,0,3600,2026-04-05,2026-04-10,On schedule. Port congestion easing at LA/LB.
+RT-004,Ho Chi Minh City (Vietnam),Hamburg (Germany),Hapag-Lloyd,32,4,DISRUPTED,18,5100,2026-03-28,2026-04-18,Full Cape of Good Hope rerouting. Significant cost and time increase.
+RT-005,Singapore,Felixstowe (UK),MSC,27,6,DELAYED,3,4400,2026-04-04,2026-04-13,Congestion at Singapore terminal. 3-day dwell time increase.
+RT-006,Mumbai (India),Antwerp (Belgium),Evergreen,22,5,NORMAL,0,2900,2026-04-06,2026-04-11,Operating normally via Suez.
+RT-007,Melbourne (Australia),Shanghai (China),OOCL,14,8,NORMAL,0,1800,2026-04-07,2026-04-12,Raw material outbound - on schedule.
+RT-008,Santos (Brazil),Rotterdam (Netherlands),CMA CGM,20,4,NORMAL,1,2600,2026-04-02,2026-04-16,Minor 1-day delay due to Brazilian port strike action. Resolved.
+RT-009,Valparaiso (Chile),Shanghai (China),Hapag-Lloyd,22,3,NORMAL,0,2100,2026-04-05,2026-04-20,Lithium exports operating normally.
+RT-010,Gdansk (Poland),Rotterdam (Netherlands),Maersk,4,20,NORMAL,0,950,2026-04-08,2026-04-09,Short-sea European feeder - no issues.
+RT-011,Odessa (Ukraine),Constanta (Romania),Regional Carrier,3,4,SUSPENDED,999,N/A,2026-01-15,SUSPENDED,Route suspended due to ongoing Black Sea conflict risk.
+RT-012,Taipei (Taiwan),San Francisco (USA),EVA Air Cargo,3,28,NORMAL,0,8200,2026-04-08,2026-04-09,Air freight for urgent semiconductor shipments. Operating normally.
