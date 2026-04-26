@@ -1,7 +1,7 @@
 # 🔗 SupplyChainIQ v6.0
 **Enterprise-Grade Risk Intelligence for the SME-Led Global Economy**
 
-SupplyChainIQ is a high-performance, AI-driven risk intelligence platform designed to democratize complex supply chain analysis. By merging static private datasets with live global news feeds, it provides SMEs with a "Digital Twin" of their logistics network—detecting disruptions before they hit the balance sheet.
+SupplyChainIQ is a high-performance, AI-driven risk intelligence platform designed to democratize complex supply chain analysis. By merging static private datasets with live global news feeds, it provides SMEs with a "Digital Twin" of their logistics network—detecting disruptions before they hit balance sheet.
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python&logoColor=white)](https://python.org)
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev)
