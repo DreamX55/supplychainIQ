@@ -150,6 +150,12 @@ Navigate to `http://localhost:3000`. Enter your **Groq API Key** in the setup sc
 *   **JWT Auth**: All endpoints are protected by standard Bearer token authentication.
 
 ---
+## Team
+
+Team Name: O(1)
+Team Members: Jonath Jimmi,Jahnavi Sri Sai Akveti, Nakshatra Vinoth, Harshitha Dussa
+
+---
 
 ## 📄 License
 MIT License. Built for the UK AI Hackathon 2026.
