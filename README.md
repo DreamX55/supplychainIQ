@@ -158,4 +158,4 @@ Team Members: Jonath Jimmi,Jahnavi Sri Sai Akveti, Nakshatra Vinoth, Harshitha D
 ---
 
 ## 📄 License
-MIT License. Built for the UK AI Hackathon 2026.
+MIT License. Built for UK AI Tool Development Challenge 2026.
